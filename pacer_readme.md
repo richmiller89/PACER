@@ -18,8 +18,8 @@ A cost-optimized federal court case monitoring system that tracks up to 20-30 ca
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pacer-monitor
-cd pacer-monitor
+git clone https://github.com/richmiller89/pacer
+cd pacer
 
 # Run the setup script
 chmod +x setup.sh
