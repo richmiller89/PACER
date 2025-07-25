@@ -1,0 +1,156 @@
+# PACER Monitor Configuration File
+# Copy this to config.yaml and customize for your needs
+
+# PACER Credentials (Required)
+pacer:
+  username: ""  # Your PACER username
+  password: ""  # Your PACER password
+
+# CourtListener API (Optional but recommended for free data)
+courtlistener:
+  api_token: ""  # Get from https://www.courtlistener.com/api/
+
+# Cost Management Settings
+cost_management:
+  quarterly_budget: 30.0  # Maximum quarterly spend (free tier is $30)
+  safety_buffer: 5.0      # Stop at $25 to ensure we stay under
+  
+  # Page estimates for different operations
+  estimates:
+    docket_check: 3       # Average pages for docket report
+    document_download: 10 # Average pages per document
+
+# Monitoring Intervals (in seconds)
+polling:
+  high_priority: 3600     # 1 hour
+  medium_priority: 21600  # 6 hours  
+  low_priority: 86400     # 24 hours
+  
+  # PACER recommended hours (Central Time)
+  allowed_hours:
+    start: 18  # 6 PM
+    end: 6     # 6 AM
+
+# Database Configuration
+database:
+  # Default uses SQLite (good for up to 30 cases)
+  url: "sqlite:///pacer_monitor.db"
+  
+  # For production with many cases, use PostgreSQL:
+  # url: "postgresql://user:password@localhost/pacer_monitor"
+
+# Redis Cache (optional but recommended)
+redis:
+  url: "redis://localhost:6379/0"
+  
+  # Cache TTLs (seconds)
+  ttl:
+    courtlistener_data: 3600  # 1 hour
+    case_metadata: 7200       # 2 hours
+
+# Notification Settings
+notifications:
+  # Webhook for real-time notifications
+  webhook:
+    enabled: true
+    url: ""  # Your webhook URL
+    secret: ""  # For signature verification
+    
+  # Email notifications
+  email:
+    enabled: false
+    smtp_host: "smtp.gmail.com"
+    smtp_port: 587
+    username: ""
+    password: ""
+    from_address: ""
+    to_addresses:
+      - ""
+    
+  # Notification filters
+  filters:
+    # Only notify for these document types
+    document_types:
+      - "ORDER"
+      - "OPINION"
+      - "JUDGMENT"
+      - "MOTION"
+    
+    # Minimum time between notifications per case (seconds)
+    rate_limit: 3600
+
+# Case Priorities
+# Define rules for automatic priority assignment
+priority_rules:
+  high:
+    # Cases matching these patterns get high priority
+    keywords:
+      - "preliminary injunction"
+      - "emergency"
+      - "expedited"
+    
+  low:
+    # Cases matching these patterns get low priority
+    keywords:
+      - "closed"
+      - "terminated"
+      - "stayed"
+
+# Monitoring Cases
+# Add your cases here
+cases:
+  - case_number: "2:21-cv-00234"
+    court_id: "txed"  # Eastern District of Texas
+    priority: "high"
+    notifications: true
+    
+  - case_number: "1:20-cv-05678"
+    court_id: "nysd"  # Southern District of New York
+    priority: "medium"
+    notifications: true
+    
+  - case_number: "3:22-cv-00123"
+    court_id: "cacd"  # Central District of California
+    priority: "low"
+    notifications: false
+
+# Court ID Reference (common federal courts)
+# Full list: https://www.pacer.gov/psco/cgi-bin/links.pl
+court_reference:
+  # District Courts
+  nysd: "Southern District of New York"
+  nyed: "Eastern District of New York"
+  cacd: "Central District of California"
+  cand: "Northern District of California"
+  txsd: "Southern District of Texas"
+  txed: "Eastern District of Texas"
+  ilnd: "Northern District of Illinois"
+  flsd: "Southern District of Florida"
+  dcd: "District of Columbia"
+  
+  # Bankruptcy Courts (add 'b' suffix)
+  nysbankr: "Southern District of New York Bankruptcy"
+  cacdbankr: "Central District of California Bankruptcy"
+  
+  # Appellate Courts
+  ca2: "Second Circuit"
+  ca9: "Ninth Circuit"
+  cafc: "Federal Circuit"
+
+# Advanced Settings
+advanced:
+  # Request settings
+  timeout: 30
+  max_retries: 3
+  retry_delay: 60
+  
+  # Performance tuning
+  max_concurrent_checks: 3
+  browser_headless: true
+  
+  # Logging
+  log_level: "INFO"
+  log_file: "pacer_monitor.log"
+  
+  # Development mode (uses test data, no real PACER queries)
+  development_mode: false
